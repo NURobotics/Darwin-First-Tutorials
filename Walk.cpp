@@ -98,9 +98,15 @@ void Walk::wait(int ms) {
 // function containing the main feedback loop
 void Walk::run() {
  
+ 
+ cout<<"Min Head: "<<minMotorPositions[19]<<endl;
+ cout<<"Max Head: "<<maxMotorPositions[19]<<endl;
+ cout<<"Min Neck(left): "<<minMotorPositions[18]<<endl;
+ cout<<"Max Neck(right): "<<maxMotorPositions[18]<<endl;
   // First step to update sensors values
   myStep();
   // play the hello motion
+  mMotionManager->playPage(1);
   mMotionManager->playPage(9); // init position
   wait(200);
   
@@ -135,20 +141,20 @@ void Walk::run() {
           }
           break;
         case Keyboard::UP :
-          //mGaitManager->setXAmplitude(1.0);
-          move(100,0);
+          mGaitManager->setXAmplitude(1.0);
+          //move(100,0);
           break;
         case Keyboard::DOWN :
-          //mGaitManager->setXAmplitude(-1.0);
-          move(-100,0);
+          mGaitManager->setXAmplitude(-1.0);
+          //move(-100,0);
           break;
         case Keyboard::RIGHT :
-          move(50,1);
-          //mGaitManager->setAAmplitude(-0.5);
+          //move(50,1);
+          mGaitManager->setAAmplitude(-0.5);
           break;
         case Keyboard::LEFT :
-          move(50, -1);
-          //mGaitManager->setAAmplitude(0.5);
+          //move(50, -1);
+          mGaitManager->setAAmplitude(0.5);
           break;
         case 'A' :
           if(currentNeckPos < (maxMotorPositions[18]-.1)){
@@ -185,30 +191,39 @@ void Walk::run() {
           break;
         case 'F':
           if(currentRArmPos > (minMotorPositions[1]+.1)){
-    mMotors[1]->setPosition(currentRArmPos-0.005);
-    mMotors[3]->setPosition(currentRArmPos-0.005);
-    mMotors[5]->setPosition(currentRArmPos-0.005);
-    currentRArmPos = currentRArmPos-0.005;
-    myStep();
-    }
+            mMotors[1]->setPosition(currentRArmPos-0.005);
+            mMotors[3]->setPosition(currentRArmPos-0.005);
+            mMotors[5]->setPosition(currentRArmPos-0.005);
+            currentRArmPos = currentRArmPos-0.005;
+            myStep();
+          }
           break;
-        case 'J':
-          if(currentLArmPos > (minMotorPositions[2]+.1)){
-        mMotors[0]->setPosition(currentLArmPos-0.005);
-        mMotors[2]->setPosition(currentLArmPos-0.005);
-        mMotors[4]->setPosition(currentLArmPos-0.005);
-        currentLArmPos = currentLArmPos-0.005;
-        myStep();
-        }
-        break;
         case 'H':
-          if(currentLArmPos < (minMotorPositions[2]-.1)){
+          //if(currentLArmPos > (minMotorPositions[2]+.1)){
+          //mMotors[13]->setPosition(minMotorPositions[13]);
+        //mMotors[1]->setPosition(1);
+        //mMotors[3]->setPosition(-1);
+        //mMotors[5]->setPosition(maxMotorPositions[5]);
+        //currentLArmPos = currentLArmPos-0.005;
+        //myStep();
+        //}
+          headmove(0,0);
+          wait(3000);
+          headmove(100,100);
+          break;
+          
+        case 'J':
+          if(currentLArmPos > (minMotorPositions[2]-.1)){
         mMotors[0]->setPosition(currentLArmPos+0.005);
         mMotors[2]->setPosition(currentLArmPos+0.005);
         mMotors[4]->setPosition(currentLArmPos+0.005);
         currentLArmPos = currentLArmPos+0.005;
         myStep();
         }
+        break;
+        
+        case 'T':
+        mSpeaker->speak("Hi, I am Darwin, an anthropomorphic robot.  At Northwestern University, I have been programmed to work with virtual reality and the HTC Vive.  Now you can control a robot surrogate in another location that will mimic your every movement, and allow you to see through my eyes.", 2.0);
         break;
 
       }
@@ -262,12 +277,15 @@ void Walk::checkIfFallen() {
 //Walk indefinitely
 
 void Walk::move(double speed, double angle){
-
+ double s;
  // First step to update sensors values
   myStep();
   // play the hello motion
+ // mSpeaker->speak("Hello Wyatt",1.0);
+  
+  mMotionManager->playPage(1);
   mMotionManager->playPage(9); // init position
-  wait(200);
+  wait(5000);
   
 
   // main loop
@@ -275,33 +293,43 @@ void Walk::move(double speed, double angle){
     mGaitManager->setAAmplitude(0.0);
 
     mGaitManager->start();
+    mGaitManager->step(mTimeStep);
     wait(200);
 
-  
+  s = getTime() + 3;
   while (true) {
     checkIfFallen();
-    if(angle == 0){        
-    mGaitManager->setXAmplitude(speed/100);
+    if(angle == 0){   
+      mGaitManager->setXAmplitude(speed/100);
     }
     else if(angle > 0){
-    mGaitManager->setAAmplitude(-speed/100);
+      mGaitManager->setAAmplitude(-speed/100);
     }
     else if(angle < 0){
-    mGaitManager->setAAmplitude(speed/100);
+      mGaitManager->setAAmplitude(speed/100);
     }
-    
     mGaitManager->step(mTimeStep);
     // step
     myStep();
   }
-}
+  
+}  
 
 
 
 //Stop walking 
-
 void Walk::stopMov(){
 
-  mGaitManager->stop();
+ mGaitManager->stop(); 
+}
+
+//Head and Neck Movement
+//100x100 grid; (0,0) is top left; (100,100) is bottom right
+void Walk::headmove(double xcoord,double ycoord){
+  double x = ((xcoord/100)*1.29)-.36;
+  double y = ((ycoord/100)*3.62)-1.81;
   
+  mMotors[18]->setPosition(y);
+  mMotors[19]->setPosition(x);
+  myStep();
 }
