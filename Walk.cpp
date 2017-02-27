@@ -226,6 +226,9 @@ void Walk::run() {
         mSpeaker->speak("Hi, I am Darwin, an anthropomorphic robot.  At Northwestern University, I have been programmed to work with virtual reality and the HTC Vive.  Now you can control a robot surrogate in another location that will mimic your every movement, and allow you to see through my eyes.", 2.0);
         break;
 
+        case 'E':
+        return;
+        break;
       }
     }
 
@@ -277,7 +280,6 @@ void Walk::checkIfFallen() {
 //Walk indefinitely
 
 void Walk::move(double speed, double angle){
- double s;
  // First step to update sensors values
   myStep();
   // play the hello motion
@@ -296,7 +298,6 @@ void Walk::move(double speed, double angle){
     mGaitManager->step(mTimeStep);
     wait(200);
 
-  s = getTime() + 3;
   while (true) {
     checkIfFallen();
     if(angle == 0){   
@@ -324,7 +325,7 @@ void Walk::stopMov(){
 }
 
 //Head and Neck Movement
-//100x100 grid; (0,0) is top left; (100,100) is bottom right
+//100x100 grid; (100,100) is top left; (0,0) is bottom right
 void Walk::headmove(double xcoord,double ycoord){
   double x = ((xcoord/100)*1.29)-.36;
   double y = ((ycoord/100)*3.62)-1.81;
@@ -333,3 +334,45 @@ void Walk::headmove(double xcoord,double ycoord){
   mMotors[19]->setPosition(x);
   myStep();
 }
+
+void Walk::timedWalk(double speed, double angle){
+ double s;
+ // First step to update sensors values
+  myStep();
+  // play the hello motion
+  
+  mMotionManager->playPage(1);
+  mMotionManager->playPage(9); // init position
+  wait(2000);
+  
+
+  // main loop
+    mGaitManager->setXAmplitude(0.0);
+    mGaitManager->setAAmplitude(0.0);
+
+    mGaitManager->start();
+    mGaitManager->step(mTimeStep);
+    wait(200);
+
+  s = getTime() + 5;
+  while (getTime() < s) {
+    checkIfFallen();
+    if(angle == 0){   
+      mGaitManager->setXAmplitude(speed/100);
+    }
+    else if(angle > 0){
+      mGaitManager->setAAmplitude(-speed/100);
+    }
+    else if(angle < 0){
+      mGaitManager->setAAmplitude(speed/100);
+    }
+    mGaitManager->step(mTimeStep);
+    // step
+    myStep();
+  }
+  mGaitManager->setXAmplitude(0);
+  mGaitManager->setAAmplitude(0);
+  mGaitManager->stop();
+  wait(1000);
+  return;
+}  
