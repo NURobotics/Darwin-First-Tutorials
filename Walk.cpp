@@ -36,9 +36,9 @@ static double maxMotorPositions[NMOTORS];
 
 static const char *motorNames[NMOTORS] = {
   "ShoulderR" /*ID0 */, "ShoulderL" /*ID1 */, "ArmUpperR" /*ID2 */, "ArmUpperL" /*ID3 */,
-  "ArmLowerR" /*ID4 */, "ArmLowerL" /*ID5 */, "PelvYR"    /*ID8 */, "PelvYL"    /*ID7 */,
+  "ArmLowerR" /*ID4 */, "ArmLowerL" /*ID5 */, "PelvYR"    /*ID6 */, "PelvYL"    /*ID7 */,
   "PelvR"     /*ID8 */, "PelvL"     /*ID9*/, "LegUpperR" /*ID10*/, "LegUpperL" /*ID11*/,
-  "LegLowerR" /*ID12*/, "LegLowerL" /*ID13*/, "AnkleR"    /*ID16*/, "AnkleL"    /*ID15*/,
+  "LegLowerR" /*ID12*/, "LegLowerL" /*ID13*/, "AnkleR"    /*ID14*/, "AnkleL"    /*ID15*/,
   "FootR"     /*ID16*/, "FootL"     /*ID17*/, "Neck"      /*ID18*/, "Head"      /*ID19*/
 };
 
@@ -376,3 +376,8 @@ void Walk::timedWalk(double speed, double angle){
   wait(1000);
   return;
 }  
+
+void Walk::moveShoulders(){
+  
+
+}
